@@ -6,7 +6,7 @@ Scales and relocates the input fields based on the location and scale of phaser 
 ```javascript
 var phaser = new Phaser.Game( [...] );
 var ptf = new PhaserTextField(phaser);
-ptf.create('txtUsername', 10, 10, 120, 20, 'prettyCssClass', false); // x, y, width, height
+ptf.create('txtUsername', 10, 10, 120, 20, {cssClass: 'prettyCssClass', type: 'text'}); // x, y, width, height
 [...]
 var value = ptf.getValue('txtUsername');
 [...]
