@@ -1,6 +1,8 @@
 /**
  * Locates input fields over the phaser canvas using stage coordinates and scaling.
  * 
+ * In order to prevent losing control on the game, this utility sets stage.disableVisibilityChange to true while there are textfields being displayed
+ * 
  * @author Santiago Zapata (@slashie_)
  * 
  */
@@ -16,15 +18,22 @@ function PhaserTextField(phaser) {
 	this.components = [];
 	var ptf = this;
 	window.addEventListener("resize", function(){setTimeout(function(){ptf._relocateComponents();}, 100);});
+	this.defaultDisableVisibilityChange = this.phaser.stage.disableVisibilityChange;
 }
 
 module.exports = PhaserTextField;
 
 PhaserTextField.prototype = {
-	create: function(id, x, y, width, height, cssClass, password){
+	create: function(id, x, y, width, height, params){
+		var cssClass = params.cssClass;
+		var type = params.type;
 		var textField = document.createElement("input");
-		if (password)
-			textField.setAttribute("type", "password");
+		if (type)
+			textField.setAttribute("type", type);
+		if (params.onBlur){
+			textField.addEventListener("blur", params.onBlur);
+		}
+		
 		textField.style.visibility = 'hidden';
 		textField.style.position = 'absolute';
 		textField.ptf_top = y;
@@ -38,6 +47,7 @@ PhaserTextField.prototype = {
 		this.components.push(textField);
 		this._relocateComponents();
 		textField.style.visibility = 'visible';
+		this.phaser.stage.disableVisibilityChange = true;
 	},
 	getValue: function(id){
 		return this._get(id).value;
@@ -51,6 +61,9 @@ PhaserTextField.prototype = {
 			}
 		}
 		this.container.removeChild(this._get(id));
+		if (this.components.length == 0){
+			this.phaser.stage.disableVisibilityChange = this.defaultDisableVisibilityChange;
+		}
 	},
 	_relocateComponents: function(){
 		var oy = this.phaser.canvas.offsetTop;
